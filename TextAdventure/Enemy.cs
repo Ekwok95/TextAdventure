@@ -32,6 +32,9 @@ namespace TextAdventure
             protected int hp;
             protected int attackStat;
             protected int defenceStat;
+            protected int expDrop;
+            protected int enemyLevel;
+
 
             public EnemyBase()
             {
@@ -41,6 +44,7 @@ namespace TextAdventure
                 hp = 0;
                 attackStat = 0;
                 defenceStat = 0;
+                expDrop = 0;
             }
 
             /*
@@ -62,12 +66,22 @@ namespace TextAdventure
                 get;
                 set;
             }
+            public abstract int EnemyLevel
+            {
+                get;
+                set;
+            }
+            public abstract int EnemyXP
+            {
+                get;
+                set;
+            }
         }
 
         //Implement interfaces apart from base classes...
         public class GeneralEnemy : EnemyBase, IOffense, IDefend
         {
-            public GeneralEnemy(string name, string type, string rank, int health, int attack, int defence) : base()
+            public GeneralEnemy(string name, string type, string rank, int health, int attack, int defence, int exp) : base()
             {
                 enemyName = name;
                 enemyClass = type;
@@ -75,6 +89,7 @@ namespace TextAdventure
                 hp = health;
                 attackStat = attack;
                 defenceStat = defence;
+                expDrop = exp;
             }
 
             public override int EnemyHealth
@@ -112,6 +127,29 @@ namespace TextAdventure
                 set
                 {
                     defenceStat = value;
+                }
+            }
+            public override int EnemyLevel
+            {
+                get
+                {
+                    return enemyLevel;
+                }
+
+                set
+                {
+                    enemyLevel = value;
+                }
+            }
+            public override int EnemyXP
+            {
+                get
+                {
+                    return expDrop;
+                }
+                set
+                {
+                    expDrop = value;
                 }
             }
 

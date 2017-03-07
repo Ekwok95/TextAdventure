@@ -10,7 +10,9 @@ using System.Windows.Forms;
  * 3/3/2017- Finished the save file and player profile feature
  * 5/3/2017- Finished implementing the base enemy class and interface methods for attack and defend.
  * 6/3/2017- Started on Enemy class. Implemented abstract base class and 2 interfaces for attack and defend abilities.
- * 7/3/2017- Adjusted classes. Moved IO methods to FileIO class. Accomplished basic combat.
+ * 7/3/2017- Adjusted classes. Moved IO methods to FileIO class. Accomplished basic combat. Accomplished simple leveling system (without xp algorithm). 
+ *          Completed death system- Player needs to reload save game or create a new character. Can adjust settings later.
+ * 
 */
 
 /*
@@ -18,21 +20,24 @@ using System.Windows.Forms;
  *
  * * To do:
  * - Player save file and list- Done; Included a main menu.
- * - Enemy class- Can possibly split between evil NPCs and wild monsters....
+ * - Enemy class- Can possibly split between evil NPCs and wild monsters.... - Basic enemy class done
  * - Enemy types- Normal enemies first. Add in bosses and boss room scenarios later....
- * - Set player stats also....
- * - Combat actions
- * - Level and experience system- Set enemies to be within suitable level range (not too high or low unless player stumbles into a high level area)
+ * - Set player stats also.... - Attack and Defence stats tested and works. Attempt to use generics later.
+ * - Combat actions - Attack and Defend commands done.
+ * - Death system - Complete. Needs tweaking however.
+ * - Level and experience system- Set enemies to be within suitable level range (not too high or low unless player stumbles into a high level area)- 
+ *         - Basic levelling system complete.
+ *         - Need to figure out xp algorithm soon. Will attempt this at a later time.
  *      - NO LEVEL CAP :D
  * - Create character classes (No magic characters. Physical weapons only. Can add enchant feature for weapons to reduce player disadvantage)
  *      - Have classes share SOME abilities, not all.
  *      - Create all abilities in advance.
  *      - Use binary tree to allow skill/advanced class tiers
  * - Armor and weapon types (Tiers and linked lists)- Set weapon stats to have a reasonable range(So that weapons don't become OP or UP).
- * - Weapon combos and abilities
- * - Death system
- * - Timed combat (If I can pull it off...)- Can adjust for other options
+ * - Weapon combos and abilities- Add in energy/MP field to be adjusted according to abilities as they are done.
  * - Item Lists/Items- Gradually add to base list as game is being developed.
+ * - Finishing moves- Will consider this after 
+ * - Timed combat (If I can pull it off...)- Can adjust for other options; Can consider doing elapsed time instead of countdown.
  * - Inventory- Create inventory with item details/stats. Also add inventory functions (Sorting functions, discard, etc..)
  * - NPCs- Friendly NPCs only. Enemies are already a class of their own.
  *      - Can add personalities to NPCs when game is complete (or more like adjusted properly).
@@ -68,6 +73,9 @@ namespace TextAdventure
         private int hp;
         private int attack;
         private int defence;
+        private int currentXP;
+        private int requiredXP;
+        private int currentLevel;
         //public string characterClass;
 
         public Player(string nm)
@@ -76,6 +84,9 @@ namespace TextAdventure
             hp = 50;
             attack = 10;
             defence = 10;
+            currentXP = 0;
+            requiredXP = 100;
+            currentLevel = 1;
         }
 
         public int PlayerHealth
@@ -96,6 +107,23 @@ namespace TextAdventure
             set { defence = value; }
         }
 
+        public int PlayerCurrentXP
+        {
+            get { return currentXP; }
+            set { currentXP = value; }
+        }
+
+        public int PlayerNextLevelXP
+        {
+            get { return requiredXP; }
+            set { requiredXP = value; }
+        }
+
+        public int PlayerLevel
+        {
+            get { return currentLevel; }
+            set { currentLevel = value; }
+        }
         public override string ToString()
         {
             return name;
@@ -118,6 +146,22 @@ namespace TextAdventure
         public void CheckCondition()
         {
             Console.WriteLine("Your current HP is {0}.", hp);
+        }
+
+        public void addXP(int xpDrop)
+        {
+            int attackUp = 5;
+            int defenceUp = 2;
+            currentXP = currentXP + xpDrop;
+            if(currentXP >= requiredXP)
+            {
+                currentLevel++;
+                attack = attack + attackUp;
+                defence = defence + defenceUp;
+                Console.WriteLine("You have leveled up! Congratulations!");
+                Console.WriteLine("Attack +{0}", attackUp);
+                Console.WriteLine("Defence +{0}", defenceUp);
+            }
         }
     }
 
@@ -171,7 +215,7 @@ namespace TextAdventure
 
             Actions setOfActions = new Actions();
             Random dice = new Random();
-            Enemy.GeneralEnemy NormalEnemy = new Enemy.GeneralEnemy("Enemy", "Grunt", "Easy", 50, 5, 5);
+            
 
             //Place all movement, combat and misc actions into actions class....
             //Make individual action types/classes and then combine into final Action class....
@@ -184,6 +228,7 @@ namespace TextAdventure
 
             do
             {
+                
                 //Check for user in file.
 
                 /* if(Player == null)
@@ -228,7 +273,7 @@ namespace TextAdventure
                 if (intention.Equals("walk"))
                 {
                     temp = AskPlayer(1);
-                    steps = Int32.Parse(temp);
+                    steps = Int32.Parse(temp);//use try keyword here just in case someone uses word instead of number.
                     Console.WriteLine("Which direction would you like to walk towards?");
                     direction = Console.ReadLine();
                     setOfActions.Walk(steps, direction);
@@ -279,6 +324,10 @@ namespace TextAdventure
                         {
                             string response = "";
                             Console.WriteLine("You encounter an enemy!");
+
+                            Enemy.GeneralEnemy NormalEnemy = new Enemy.GeneralEnemy("Enemy", "Grunt", "Easy", 50, 5, 5, 50);
+                            NormalEnemy.EnemyLevel = character.PlayerLevel;
+
                             Console.WriteLine("A {0} attempts to attack you.", NormalEnemy);
                             do
                             {
@@ -336,10 +385,19 @@ namespace TextAdventure
                                 ClearLine();
 
                             } while (character.PlayerHealth > 0 && NormalEnemy.EnemyHealth > 0);
-                            
-                            if(NormalEnemy.EnemyHealth == 0)
+
+                            if (NormalEnemy.EnemyHealth == 0)
                             {
                                 Console.WriteLine("You have slain {0}!", NormalEnemy);
+                                character.addXP(NormalEnemy.EnemyXP);
+                                Console.WriteLine("You have gained {0} xp from slaying {1}.", NormalEnemy.EnemyXP, NormalEnemy);
+
+                                NormalEnemy = null;
+
+                                Console.WriteLine("Your current xp is {0}", character.PlayerCurrentXP);
+
+                                Console.WriteLine("You need {0} xp in order to level up.", (character.PlayerNextLevelXP-character.PlayerCurrentXP));
+                                //Consider removing this line in future...
                             }
                             else if(character.PlayerHealth == 0)
                             {
