@@ -12,13 +12,13 @@ namespace TextAdventure
         void Condition();
     }
 
-    public abstract class Item
+    public class Item
     {
         private string name;
         private int iValue;
         protected string itemType;
         private bool equippable;
-        private int quantity;
+        //private int quantity;
         //public string description;
         //private int weight;
 
@@ -26,7 +26,7 @@ namespace TextAdventure
         {
             name = itemName;
             iValue = itemValue;
-            quantity = iQuantity;
+            //quantity = iQuantity;
             //description = itemDesc;
             //weight = itemWeight;
         }
@@ -47,13 +47,7 @@ namespace TextAdventure
         {
             get { return equippable; }
         }
-
-        public int Quantity
-        {
-            get { return quantity; }
-            set { quantity = value; }
-        }
-
+        
         public override string ToString()
         {
             return name;
