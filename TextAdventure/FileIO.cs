@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using Microsoft.VisualBasic.FileIO;
+using static TextAdventure.RunGame;
 
 namespace TextAdventure
 {

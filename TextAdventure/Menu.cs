@@ -35,7 +35,7 @@ namespace TextAdventure
 
             //Test testGame = new Test();
 
-            Test.RunGame();
+            RunGame.Test.RunGame();
 
             /*
         string[] options = { "New Game", "Load", "Credits", "Quit Game" };
