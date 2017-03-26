@@ -7,7 +7,6 @@ namespace TextAdventure
 {
     public class FileIO
     {   
-
         //Consider getting userDetails from Player object/class...
         //Consider maintaining save file data in an object...
         public void WriteToSaveFile(string[] userDetails, int numberOfFields, string filename)

@@ -17,7 +17,10 @@ using System.Threading.Tasks;
  *          Completed death system- Player needs to reload save game or create a new character. Can adjust settings later.
  * 14/3/2017- Added interface functions for attack commands         
  * 15/3/2017- Moved actual game operation into RunGame class. Changing CharacterDiscipline class to inherit from Player class. Moved character classes around
- * 21/3/2017- Created Swordsman class over CharacterBase abstract class. Started creating Item class. Mostly completed now. Tested XP algorithm
+ * 21/3/2017- Created Swordsman class over CharacterBase abstract class. Started creating Item class. Mostly completed now. Tested XP algorithm.
+ * 24/3/2017- Made Inventory class and Item class. Going to test tomorrow since I'm pretty tired tonight...
+ * 25/3/2017- Inventory class has been a success. Can add items to inventory now. Next thing to do is use and remove functions.
+ * 26/3/2017- Inventory class almost complete. Only lacking a sorting function. Started Equipment class for equipping weapons & armour.
 */
 
 /*
@@ -45,6 +48,7 @@ using System.Threading.Tasks;
  * - Weapon combos and abilities- Add in energy/MP field to be adjusted according to abilities as they are done.- Configure attack functions to accept references from other functions to 
  *      chain combos.
  * - Item Lists/Items- Gradually add to base list as game is being developed.
+ * - Item database- To refer to item stats and detailed descriptions.- Use hash table.
  * - Finishing moves- Will consider this after combat system has been developed.
  * - Timed combat (If I can pull it off...)- Can adjust for other options; Can consider doing elapsed time instead of countdown.
  * - Inventory- Create inventory with item details/stats. Also add inventory functions (Sorting functions, discard, etc..)
@@ -67,6 +71,7 @@ using System.Threading.Tasks;
  *      - Add level description to quests
  *      - Quest lines with linked lists/some other data structure.
  *      - Set quest ID for easy reference
+ *      - If setting quest lines, use linked lists.
  * - Difficulty Levels :P (Will consider it. No promises though.)
  * - Boss mechanics 0_0
  * - Playtime- Use Stopwatch class methods and Stopwatch.Elapsed method then write this timestamp to file.
@@ -101,16 +106,18 @@ namespace TextAdventure
         public static void RunGame()
         {
             ///*Player character*/
-            string intention, direction = "", temp = "", name = "";
+            string intention, direction = "", temp = "";
             int steps = 0;
             bool justLoggedIn = true;
+            //string name = "";
 
             ClearLine();
-
+/*
             Console.WriteLine("Enter name pls");
             name = Console.ReadLine();
-            Swordsman character = new Swordsman(name);
-
+            */
+            //Swordsman character = new Swordsman(name);
+            Swordsman character = new Swordsman("Ekwok");
 
             ClearLine();
             //Change code for object creation.... 
@@ -128,7 +135,13 @@ namespace TextAdventure
             Actions setOfActions = new Actions();
             Random dice = new Random();
             Item[] items = createTestItems();
-            
+            Inventory inventory = new Inventory();
+            bool menuAction = false;
+
+            for(int i=0; i<7; i++)
+            {
+                inventory.AddItem(items[i]);
+            }
 
             //Place all movement, combat and misc actions into actions class....
             //Make individual action types/classes and then combine into final Action class....
@@ -152,6 +165,7 @@ namespace TextAdventure
                     Player player1 = new Player(user);
                     }
                     */
+
                 intention = AskPlayer(0);
 
                 /*if(Console.ReadKey(true).Key == ConsoleKey.Escape)
@@ -166,11 +180,13 @@ namespace TextAdventure
                 if (intention.Equals("help"))
                 {
                     ShowCommands();
+                    menuAction = true;
                 }
 
-                if (intention.Equals("inv"))
+                else if (intention.Equals("inv"))
                 {
-
+                    inventory.TraverseInv();
+                    menuAction = true;
                 }
 
                 /*
@@ -186,9 +202,8 @@ namespace TextAdventure
 
                 //Combat actions....
 
-                //
-
-                if (intention.Equals("walk"))
+                //Modify function to only accept specific strings as input for direction.
+                else if (intention.Equals("walk"))
                 {
                     temp = AskPlayer(1);
                     steps = Int32.Parse(temp);//use try keyword here just in case someone uses word instead of number.
@@ -197,7 +212,7 @@ namespace TextAdventure
                     setOfActions.Walk(steps, direction);
                 }
                 /*
-                if (intention.Equals("run"))
+                if (intent/ion.Equals("run"))
                 {
                     temp = AskPlayer(1);
                     steps = Int32.Parse(temp);
@@ -207,6 +222,7 @@ namespace TextAdventure
                     //Consider making movement class...
                 }
                 */
+                
                 else
                 {
                     Console.WriteLine("Command invalid. Please try again.");
@@ -233,7 +249,7 @@ namespace TextAdventure
                 int randomEncounter = 0, enemyChoice = 0;
                 bool isDead = false, isDefending = false;
 
-                randomEncounter = randomizer(dice);
+                randomEncounter = randomizer(dice, menuAction);
 
 
                 switch (randomEncounter)
@@ -324,8 +340,12 @@ namespace TextAdventure
 
                             if (NormalEnemy.EnemyHealth <= 0)
                             {
+                                Item potion = new Item("Potion", 10, false, 1001);
                                 Console.WriteLine("You have slain {0}!", NormalEnemy);                                    
                                 Console.WriteLine("You have gained {0} xp from slaying {1}.", NormalEnemy.EnemyXP, NormalEnemy);
+                                Console.WriteLine("You pick up a {0} from slaying {1}.", potion, NormalEnemy);
+                                inventory.AddItem(potion);
+
                                 character.addXP(NormalEnemy.EnemyXP);
 
                                 NormalEnemy = null;
@@ -390,6 +410,8 @@ namespace TextAdventure
             return response;
         }
 
+        //Commands to add to list: inventory(inv), attack commands list(combat), 
+        //Place attack commands list in another list.
         private static void ShowCommands()
         {
             string commandFile = "commands.txt";
@@ -416,19 +438,28 @@ namespace TextAdventure
             //Console.ReadKey();
         }
 
-        public static int randomizer(Random dice)
+        public static int randomizer(Random dice, bool menuAction)
         {
-            int outcome;
-            outcome = dice.Next(0, 0);
+            int outcome = 0;
+
+            if(menuAction == false)
+            {
+                outcome = dice.Next(1, 1);
+            }
+                        
             return outcome;
         }
 
         public static Item[] createTestItems()
         {            
-            Item potion = new Item("Potion", 10, false, 1);
-            Item longsword = new Item("Longsword", 100, true, 1);
-            Item shield = new Item("Shield", 50, true, 1);
-            Item[] listOfItems = new Item[] { potion, longsword, shield };
+            Item potion = new Item("Potion", 10, false, 1001);
+            Item longsword = new Weapons("Longsword", 100, "sword", 1, 10, 2001);
+            Item shield = new DefensiveArm("Shield", 50, "shield", 10, 3001);
+            Item chestplate = new Armour("Chestplate", 500, "chestplate", 50, "torso", 4001);
+            Item platelegs = new Armour("Platelegs", 350, "platelegs", 35, "legs", 4002);
+            Item pauldrons = new Armour("Pauldrons", 350, "gloves", 35, "arms", 4003);
+            Item helmet = new Armour("Helmet", 250, "helmet", 25, "head", 4004);
+            Item[] listOfItems = new Item[] { potion, longsword, shield, chestplate, platelegs, pauldrons, helmet};
             return listOfItems;
         }
 

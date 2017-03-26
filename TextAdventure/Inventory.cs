@@ -12,29 +12,79 @@ namespace TextAdventure
     {
         private List<Item> all;
         private int numberOfItems;
-        private int quantity;
 
         public Inventory()
         {
             all = new List<Item>();
             numberOfItems = 0;
         }
-
-        public int Quantity
-        {
-            get { return quantity; }
-            set { quantity = value; }
-        }
-
+        
+        //Modify later to manipulate quanity rather than have another object in List.- DONE
+        //Ensure to watch AddItem function in future as there is possibility for ArgumentOutOfRange Exception
         public void AddItem(Item item)
         {
-            all.Add(item);
-            numberOfItems++;
+            bool itemInInventory = false;
+            for(int i=0; i<numberOfItems; i++)
+            {
+                if (item.ItemNumber == all[i].ItemNumber)
+                {
+                    all[i].Quantity++;
+                    itemInInventory = true;
+                }               
+            }
+
+            if(!itemInInventory)
+            {
+                all.Add(item);
+                numberOfItems++;
+            }          
         }
 
-        public void RemoveItem(int index)
+        public void RemoveItem(Item item, int index, int numberToRemove)
         {
-            all.RemoveAt(index);
+            if (numberToRemove < item.Quantity)
+            {
+                item.Quantity = item.Quantity - numberToRemove;
+            }
+            else
+            {
+                all.RemoveAt(index);
+                numberOfItems--;
+            }            
+        }
+
+        //Start with single stat restore/boost before addding in multiple values at once
+        //Specify item type and restore type to match with character stat.
+        public void UseItem(CharacterBase character, Aid item)
+        {
+            int statRestore = item.RestorationVolume;
+            character.PlayerHealth = character.PlayerHealth + statRestore;               
+        }
+
+        public void EquipItem(CharacterBase character, Item item)
+        {
+            if (item.Equippable)
+            {
+                if (item.ItemType.Equals("Primary"))
+                {
+                    
+                }
+                else if (item.ItemType.Equals("Secondary"))
+                {
+
+                }
+                else if (item.ItemType.Equals("Armour"))
+                {
+
+                }
+                //Set data structure to link body parts and equippable items
+                //Concat equipment names to body parts ( Right Arm-- Longsword )
+                //Show stat increases/decreases
+            }
+            else
+            {
+                Console.WriteLine("You cannot equip this item");
+            }
         }
 
         /*
@@ -44,46 +94,109 @@ namespace TextAdventure
         }
         */
 
-        //Receive user input to enter/exit inventory
-        //Detect user keypress to traverse inventory
+        //Receive user input to enter/exit inventory-- DONE
+        //Detect user keypress to traverse inventory-- DONE
         public void TraverseInv()
         {
             bool leaveInventory = false;
             ConsoleKeyInfo key;
             int currentItem = 0;
-
+            
             do
             {
-                key = Console.ReadKey();
-                Console.WriteLine("{0}-- {1}", currentItem, all[currentItem]);
-                if (key.Key == ConsoleKey.DownArrow)
+                Console.WriteLine(" {0}-- {1}       x{2}", currentItem, all[currentItem], all[currentItem].Quantity);
+                if (currentItem < numberOfItems && currentItem >= 0)
                 {
-                    if (currentItem < numberOfItems)
+                    key = Console.ReadKey();
+
+                    if (key.Key == ConsoleKey.DownArrow)
                     {
-                        currentItem++;
-                        Console.WriteLine("{0}-- {1}", currentItem, all[currentItem]);
+                        if (currentItem == (numberOfItems - 1))
+                        {
+                            //Console.WriteLine("You can't go down any further");
+                        }
+                        else
+                        {
+                            currentItem++;
+                            //Console.WriteLine(" {0}-- {1}       x{2}", currentItem, all[currentItem], all[currentItem].Quantity);
+                        }
                     }
-                    else if(currentItem >= numberOfItems)
+                    else if (key.Key == ConsoleKey.UpArrow)
                     {
-                        Console.WriteLine("You are at the maximum number of items. You cannot go down further.");
+                        if (currentItem == 0)
+                        {
+                            //Console.WriteLine("You can't go up any further");
+                        }
+                        else
+                        {
+                            currentItem--;
+                           //Console.WriteLine("{0}-- {1}       x{2}", currentItem, all[currentItem], all[currentItem].Quantity);
+                        }
                     }
-                }
-                else if(key.Key == ConsoleKey.UpArrow)
-                {
-                    if (currentItem >= 0)
+                    else if (key.Key == ConsoleKey.Enter)
                     {
-                        currentItem--;
-                        Console.WriteLine("{0}-- {1}", currentItem, all[currentItem]);
+                        Test.ClearLine();
+                        Console.WriteLine("What would you like to do?");
+                        //Add in functions to delete or use items (2 element array)
+
+                        int choice = 0;
+                        bool actedOnItem = false;
+
+                        do
+                        {
+                            key = Console.ReadKey();
+
+                            if (key.Key == ConsoleKey.DownArrow)
+                            {
+                                Console.WriteLine("Use");
+                                choice = 0;                               
+                            }
+
+                            else if (key.Key == ConsoleKey.UpArrow)
+                            {
+                                Console.WriteLine("Remove");
+                                choice = 1;
+                            }
+
+                            else if (key.Key == ConsoleKey.Enter)
+                            {
+                                actedOnItem = true;
+                                //Console.WriteLine("You pressed enter");
+                            }
+
+                            else if (key.Key == ConsoleKey.Escape)
+                            {
+                                actedOnItem = true;
+                            }
+                        } while (actedOnItem == false);
+
+                        if (choice == 0)
+                        {
+                            //UseItem();                            
+                        }
+                        else if (choice == 1)
+                        {
+                            int itemsToDelete;
+                            Console.WriteLine("How many items would you like to remove?");
+                            itemsToDelete = Convert.ToInt32(Console.ReadLine());
+                            RemoveItem(all[currentItem], currentItem, itemsToDelete);
+                        }                        
                     }
-                    else if (currentItem < 0)
+                    else if (key.Key == ConsoleKey.Escape)
                     {
-                        Console.WriteLine("You are at the first item. You cannot go up further.");
+                        string decision;
+                        Console.WriteLine("Are you finished with your inventory?");
+                        decision = Console.ReadLine();
+                        if (decision.Equals("yes") || decision.Equals('y'))
+                        {
+                            leaveInventory = true;
+                        }
+                        else
+                        {
+                            leaveInventory = false;
+                        }
                     }
-                }
-                else if(key.Key == ConsoleKey.Escape)
-                {
-                    leaveInventory = true;
-                }
+                }                
             } while (leaveInventory == false);
 
         }

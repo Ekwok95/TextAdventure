@@ -14,19 +14,22 @@ namespace TextAdventure
 
     public class Item
     {
+        private int itemNumber; //Cannot be replicated; Have a number to define type of item;
         private string name;
         private int iValue;
         protected string itemType;
         private bool equippable;
-        //private int quantity;
+        private int quantity;
         //public string description;
         //private int weight;
 
-        public Item(string itemName, int itemValue, bool equippable, int iQuantity   /*, string itemDesc, int itemWeight*/)
+        public Item(string itemName, int itemValue, bool canBeEquipped, int iNumber   /*, string itemDesc, int itemWeight*/)
         {
+            itemNumber = iNumber;
             name = itemName;
             iValue = itemValue;
-            //quantity = iQuantity;
+            quantity = 1;
+            equippable = canBeEquipped;
             //description = itemDesc;
             //weight = itemWeight;
         }
@@ -42,12 +45,31 @@ namespace TextAdventure
             get { return iValue; }
             set { iValue = value; }
         }
-
+        
         public bool Equippable
         {
             get { return equippable; }
+            //set { equippable = value; }
         }
         
+        public int ItemNumber
+        {
+            get { return itemNumber; }
+        }
+
+        public string ItemType
+        {
+            get { return itemType; }
+            set { itemType = value; }
+        }
+
+        public int Quantity
+        {
+            get { return quantity; }
+            set { quantity = value; }
+        }
+        
+
         public override string ToString()
         {
             return name;
@@ -57,26 +79,18 @@ namespace TextAdventure
     public class Weapons : Item, Condition
     {
         private string weaponType;
-        private string arm;
         //private int[] attackPower;
         private int attackPower;
         private int weaponSpeed;
         private int condition;
 
-        public Weapons(string itemName, int itemValue, string type, int speed, int weaponDamage, int quantity) : base(itemName, itemValue, true, quantity)
+        public Weapons(string itemName, int itemValue, string type, int speed, int weaponDamage, int iNumber) : base(itemName, itemValue, true, iNumber)
         {
             itemType = "Primary";
             weaponType = type;
             weaponSpeed = speed;
-            arm = "Right";
             attackPower = weaponDamage;
             condition = 100;
-        }
-
-        public string ItemType
-        {
-            get { return itemType; }
-            set { itemType = value; }
         }
 
         public string WeaponType
@@ -149,22 +163,14 @@ namespace TextAdventure
     {
         private string armType;
         private int defence;
-        private string arm;
         private int condition;
 
-        public DefensiveArm(string itemName, int itemValue, string type, int armsDefence, int quantity) : base(itemName, itemValue, true, quantity)
+        public DefensiveArm(string itemName, int itemValue, string type, int armsDefence, int iNumber) : base(itemName, itemValue, true, iNumber)
         {
             itemType = "Secondary";
             armType = type;
             defence = armsDefence;
-            arm = "Left";
             condition = 100;
-        }
-
-        public string ItemType
-        {
-            get { return itemType; }
-            set { itemType = value; }
         }
 
         public string ArmsType
@@ -218,7 +224,7 @@ namespace TextAdventure
         //private int xResistance;
         private int condition;
         
-        public Armour(string itemName, int itemValue, string type, int defence, string bodyPart, int quantity) : base(itemName, itemValue, true, quantity)
+        public Armour(string itemName, int itemValue, string type, int defence, string bodyPart, int iNumber) : base(itemName, itemValue, true, iNumber)
         {
             itemType = "Armour";
             armourType = type;
@@ -276,7 +282,7 @@ namespace TextAdventure
         private string aidType;
         private int recoveryAmount;
 
-        public Aid(string itemName, int itemValue, int quantity, string type, int restoreVolume) : base(itemName, itemValue, false, quantity)
+        public Aid(string itemName, int itemValue, string type, int restoreVolume, int iNumber) : base(itemName, itemValue, false, iNumber)
         {
             aidType = type;
             recoveryAmount = restoreVolume;
@@ -341,10 +347,12 @@ namespace TextAdventure
 
         public void Equip(Item item, CharacterBase character)
         {
+            /*
             if (item.Equippable)
             {
                 //character.PlayerAttack = item.
             }
+            */
         }
     }
     

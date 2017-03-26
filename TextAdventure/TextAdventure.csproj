@@ -50,6 +50,7 @@
     <Compile Include="Actions.cs" />
     <Compile Include="CharacterDiscipline.cs" />
     <Compile Include="AttackCommands.cs" />
+    <Compile Include="Equipment.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="FileIO.cs" />
     <Compile Include="Inventory.cs" />

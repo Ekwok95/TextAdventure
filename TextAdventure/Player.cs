@@ -69,6 +69,16 @@ namespace TextAdventure
             Console.WriteLine("Your current HP is {0}.", hp);
         }
 
+        public void ShowStats()
+        {
+            Console.WriteLine("HP-- {0}", PlayerHealth);
+            Console.WriteLine("Attack-- {0}", PlayerAttack);
+            Console.WriteLine("Defence-- {0}", PlayerDefence);
+            Console.WriteLine("Level-- {0}", PlayerLevel);
+            Console.WriteLine("Current XP-- {0}", PlayerCurrentXP);
+            Console.WriteLine("Required XP-- {0}", PlayerNextLevelXP);
+        }
+
         public void addXP(int xpDrop)
         {
             int attackUp = 5;
