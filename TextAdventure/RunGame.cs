@@ -21,6 +21,8 @@ using System.Threading.Tasks;
  * 24/3/2017- Made Inventory class and Item class. Going to test tomorrow since I'm pretty tired tonight...
  * 25/3/2017- Inventory class has been a success. Can add items to inventory now. Next thing to do is use and remove functions.
  * 26/3/2017- Inventory class almost complete. Only lacking a sorting function. Started Equipment class for equipping weapons & armour.
+ * 17/12/2017 - Inventory class now has spam lock. Changed around some if statements so that only what is important will show.
+ * 18/12/2017 - Changed some class names. Will most likely restructure dependencies for player class by combining inventory and equipment. Will add some more after considering in future.
 */
 
 /*
@@ -135,8 +137,9 @@ namespace TextAdventure
             Actions setOfActions = new Actions();
             Random dice = new Random();
             Item[] items = createTestItems();
-            Inventory inventory = new Inventory();
+            Inventory inventory = new Inventory(character);
             bool menuAction = false;
+            bool releaseEnemy = false;
 
             for(int i=0; i<7; i++)
             {
@@ -154,7 +157,6 @@ namespace TextAdventure
 
             do
             {
-
                 //Check for user in file.
 
                 /* if(Player == null)
@@ -181,12 +183,14 @@ namespace TextAdventure
                 {
                     ShowCommands();
                     menuAction = true;
+                    releaseEnemy = false;
                 }
 
                 else if (intention.Equals("inv"))
                 {
                     inventory.TraverseInv();
                     menuAction = true;
+                    releaseEnemy = false;
                 }
 
                 /*
@@ -210,6 +214,7 @@ namespace TextAdventure
                     Console.WriteLine("Which direction would you like to walk towards?");
                     direction = Console.ReadLine();
                     setOfActions.Walk(steps, direction);
+                    releaseEnemy = true;
                 }
                 /*
                 if (intent/ion.Equals("run"))
@@ -222,12 +227,14 @@ namespace TextAdventure
                     //Consider making movement class...
                 }
                 */
-                
+
                 else
                 {
                     Console.WriteLine("Command invalid. Please try again.");
                     Console.WriteLine("If you need help, type in 'help' in the next line.");
+                    releaseEnemy = false;
                 }
+
                 ClearLine();
 
                 /*
@@ -251,134 +258,137 @@ namespace TextAdventure
 
                 randomEncounter = randomizer(dice, menuAction);
 
-
-                switch (randomEncounter)
+                if (releaseEnemy == true)
                 {
-                    case 1:
-                        {
-                            string response = "";
-                            Console.WriteLine("You encounter an enemy!");
-
-                            Enemy.GeneralEnemy NormalEnemy = new Enemy.GeneralEnemy("Enemy", "Grunt", "Easy", 50, 5, 5, 50);
-                            NormalEnemy.EnemyLevel = character.PlayerLevel;
-
-                            Console.WriteLine("A {0} attempts to attack you.", NormalEnemy);
-                            do
+                    switch (randomEncounter)
+                    {
+                        case 1:
                             {
-                                Console.WriteLine("What will you do?");
-                                response = Console.ReadLine();
-                                if (response.Equals("attack"))
+                                string response = "";
+                                Console.WriteLine("You encounter an enemy!");
+
+                                Enemy.GeneralEnemy NormalEnemy = new Enemy.GeneralEnemy("Enemy", "Grunt", "Easy", 50, 5, 5, 50);
+                                NormalEnemy.EnemyLevel = character.PlayerLevel;
+
+                                Console.WriteLine("A {0} attempts to attack you.", NormalEnemy);
+                                do
                                 {
-                                    int enemyHP = NormalEnemy.EnemyHealth;
-                                    if (isDefending != true)
+                                    Console.WriteLine("What will you do?");
+                                    response = Console.ReadLine();
+                                    if (response.Equals("attack"))
                                     {
-                                        character.Fight(NormalEnemy, enemyHP, character.PlayerAttack, NormalEnemy.EnemyDefencePower);
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("The {0} is guarding itself! Your attack does no damage!", NormalEnemy);
-                                    }
-                                }
-                                else if (response.Equals("slash"))
-                                {
-                                    int enemyHP = NormalEnemy.EnemyHealth;
-                                    if (isDefending != true)
-                                    {
-                                        //int damage;
-                                        int damageTaken = character.Slash(NormalEnemy, character);
-                                        NormalEnemy.EnemyHealth = NormalEnemy.EnemyHealth - damageTaken;
-                                        if (NormalEnemy.EnemyHealth >= 0)
+                                        int enemyHP = NormalEnemy.EnemyHealth;
+                                        if (isDefending != true)
                                         {
-                                            Console.WriteLine("{0} now has {1} HP.", NormalEnemy, NormalEnemy.EnemyHealth);
+                                            character.Fight(NormalEnemy, enemyHP, character.PlayerAttack, NormalEnemy.EnemyDefencePower);
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("The {0} is guarding itself! Your attack does no damage!", NormalEnemy, NormalEnemy);
                                         }
                                     }
-                                    else
+                                    else if (response.Equals("slash"))
                                     {
-                                        Console.WriteLine("The {0} is guarding itself! Your attack does no damage!", NormalEnemy);
+                                        int enemyHP = NormalEnemy.EnemyHealth;
+                                        if (isDefending != true)
+                                        {
+                                            //int damage;
+                                            int damageTaken = character.Slash(NormalEnemy, character);
+                                            NormalEnemy.EnemyHealth = NormalEnemy.EnemyHealth - damageTaken;
+                                            if (NormalEnemy.EnemyHealth >= 0)
+                                            {
+                                                Console.WriteLine("{0} now has {1} HP.", NormalEnemy, NormalEnemy.EnemyHealth);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("The {0} is guarding itself! Your attack does no damage!", NormalEnemy);
+                                        }
                                     }
-                                }
-                                else if (response.Equals("defend"))
-                                {
-                                    character.Guard();
-                                    Console.WriteLine("You guard yourself against {0}.", NormalEnemy);
-                                    character.CheckCondition();
-                                }
-                                else
-                                {
-                                    Console.WriteLine("You cannot do {0} as it does not work in battle.", response);
-                                }
-
-                                ClearLine();
-
-                                enemyChoice = dice.Next(1, 100);
-                                //switch (enemyChoice)
-                                if (enemyChoice > 50 && enemyChoice < 101)
-                                {
-                                    //case 1:
-                                    //{
-                                    isDefending = false;
-                                    if (!response.Equals("defend"))
+                                    else if (response.Equals("defend"))
                                     {
-                                        character.PlayerHealth = NormalEnemy.Attack(character.PlayerHealth, NormalEnemy.EnemyAttackPower, NormalEnemy.EnemyDefencePower);
+                                        character.Guard();
+                                        Console.WriteLine("You guard yourself against {0}.", NormalEnemy);
                                         character.CheckCondition();
                                     }
-                                    // break;
-                                }
-                                // case 2:
-                                /*else
+                                    else
+                                    {
+                                        Console.WriteLine("You cannot do {0} as it does not work in battle.", response);
+                                    }
+
+                                    ClearLine();
+
+                                    enemyChoice = dice.Next(1, 100);
+                                    //switch (enemyChoice)
+                                    if (enemyChoice > 50 && enemyChoice < 101)
+                                    {
+                                        //case 1:
+                                        //{
+                                        isDefending = false;
+                                        if (!response.Equals("defend"))
+                                        {
+                                            character.PlayerHealth = NormalEnemy.Attack(character.PlayerHealth, NormalEnemy.EnemyAttackPower, NormalEnemy.EnemyDefencePower);
+                                            character.CheckCondition();
+                                        }
+                                        // break;
+                                    }
+                                    // case 2:
+                                    /*else
+                                    {
+                                        //{
+                                        NormalEnemy.Guard();
+                                        isDefending = true;
+                                        //break;
+                                        //}
+                                    }
+                                    */
+                                    ClearLine();
+
+                                } while (character.PlayerHealth > 0 && NormalEnemy.EnemyHealth > 0);
+
+                                if (NormalEnemy.EnemyHealth <= 0)
                                 {
-                                    //{
-                                    NormalEnemy.Guard();
-                                    isDefending = true;
-                                    //break;
-                                    //}
+                                    Item potion = new Aid("Potion", 10, "potion", 10, 1001);
+                                    Console.WriteLine("You have slain {0}!", NormalEnemy);
+                                    Console.WriteLine("You have gained {0} xp from slaying {1}.", NormalEnemy.EnemyXP, NormalEnemy);
+                                    Console.WriteLine("You pick up a {0} from slaying {1}.", potion, NormalEnemy);
+                                    inventory.AddItem(potion);
+
+                                    character.addXP(NormalEnemy.EnemyXP);
+
+                                    NormalEnemy = null;
+
+                                    Console.WriteLine("Your current xp is {0}", character.PlayerCurrentXP);
+
+                                    Console.WriteLine("You need {0} xp in order to level up.", (character.PlayerNextLevelXP - character.PlayerCurrentXP));
+                                    //Consider removing this line in future...
                                 }
-                                */
-                                ClearLine();
+                                else if (character.PlayerHealth == 0)
+                                {
+                                    Console.WriteLine("You have died...");
+                                    isDead = true;
+                                }
 
-                            } while (character.PlayerHealth > 0 && NormalEnemy.EnemyHealth > 0);
-
-                            if (NormalEnemy.EnemyHealth <= 0)
-                            {
-                                Item potion = new Item("Potion", 10, false, 1001);
-                                Console.WriteLine("You have slain {0}!", NormalEnemy);                                    
-                                Console.WriteLine("You have gained {0} xp from slaying {1}.", NormalEnemy.EnemyXP, NormalEnemy);
-                                Console.WriteLine("You pick up a {0} from slaying {1}.", potion, NormalEnemy);
-                                inventory.AddItem(potion);
-
-                                character.addXP(NormalEnemy.EnemyXP);
-
-                                NormalEnemy = null;
-
-                                Console.WriteLine("Your current xp is {0}", character.PlayerCurrentXP);
-
-                                Console.WriteLine("You need {0} xp in order to level up.", (character.PlayerNextLevelXP - character.PlayerCurrentXP));
-                                //Consider removing this line in future...
-                            }
-                            else if (character.PlayerHealth == 0)
-                            {
-                                Console.WriteLine("You have died...");
-                                isDead = true;
+                                break;
                             }
 
-                            break;
+                        default:
+                            {
+                                Console.WriteLine("Nothing has happened");
+                                break;
+                            }
                         }
-                    default:
-                        {
-                            Console.WriteLine("Nothing has happened");
-                            break;
-                        }
-                }
 
-                if (isDead == true)
-                {
-                    Console.WriteLine("You are now dead. Please reload the game or create a new character.");
-                    Thread.Sleep(5000);
-                    Environment.Exit(1);
-                }
+                    if (isDead == true)
+                    {
+                        Console.WriteLine("You are now dead. Please reload the game or create a new character.");
+                        Thread.Sleep(5000);
+                        Environment.Exit(1);
+                    }
 
-                ClearLine();
-            } while (true);
+                    ClearLine();
+                }
+            } while (true);           
         }
 
         public static void ClearLine()
@@ -412,6 +422,16 @@ namespace TextAdventure
 
         //Commands to add to list: inventory(inv), attack commands list(combat), 
         //Place attack commands list in another list.
+        /*
+         * If a file is not present, make sure to check the bin/Debug directory for the text file commands.txt. This must be present or an exception will be thrown.
+         * There should be a number at the top to represent the number of lines below it.
+         * For example,
+         *  4
+         *  abc
+         *  def
+         *  g
+         *  hijklkmanafjdijfdij
+        */
         private static void ShowCommands()
         {
             string commandFile = "commands.txt";
@@ -452,7 +472,7 @@ namespace TextAdventure
 
         public static Item[] createTestItems()
         {            
-            Item potion = new Item("Potion", 10, false, 1001);
+            Item potion = new Aid("Potion", 10, "potion", 10, 1001);
             Item longsword = new Weapons("Longsword", 100, "sword", 1, 10, 2001);
             Item shield = new DefensiveArm("Shield", 50, "shield", 10, 3001);
             Item chestplate = new Armour("Chestplate", 500, "chestplate", 50, "torso", 4001);

@@ -19,17 +19,22 @@ namespace TextAdventure
         private int iValue;
         protected string itemType;
         private bool equippable;
+        private bool usable;
         private int quantity;
+        private bool restore;
+        //private bool boost;
         //public string description;
         //private int weight;
 
-        public Item(string itemName, int itemValue, bool canBeEquipped, int iNumber   /*, string itemDesc, int itemWeight*/)
+        public Item(string itemName, int itemValue, bool canBeEquipped, int iNumber, bool canBeUsed, bool canRestore   /*, string itemDesc, int itemWeight*/)
         {
             itemNumber = iNumber;
             name = itemName;
             iValue = itemValue;
             quantity = 1;
             equippable = canBeEquipped;
+            usable = canBeUsed;
+            restore = canRestore;
             //description = itemDesc;
             //weight = itemWeight;
         }
@@ -52,6 +57,16 @@ namespace TextAdventure
             //set { equippable = value; }
         }
         
+        public bool Usable
+        {
+            get { return usable; }
+        }
+
+        public bool Restore
+        {
+            get { return restore; }
+        } 
+
         public int ItemNumber
         {
             get { return itemNumber; }
@@ -84,7 +99,7 @@ namespace TextAdventure
         private int weaponSpeed;
         private int condition;
 
-        public Weapons(string itemName, int itemValue, string type, int speed, int weaponDamage, int iNumber) : base(itemName, itemValue, true, iNumber)
+        public Weapons(string itemName, int itemValue, string type, int speed, int weaponDamage, int iNumber) : base(itemName, itemValue, true, iNumber, false, false)
         {
             itemType = "Primary";
             weaponType = type;
@@ -165,7 +180,7 @@ namespace TextAdventure
         private int defence;
         private int condition;
 
-        public DefensiveArm(string itemName, int itemValue, string type, int armsDefence, int iNumber) : base(itemName, itemValue, true, iNumber)
+        public DefensiveArm(string itemName, int itemValue, string type, int armsDefence, int iNumber) : base(itemName, itemValue, true, iNumber, false, false)
         {
             itemType = "Secondary";
             armType = type;
@@ -224,7 +239,7 @@ namespace TextAdventure
         //private int xResistance;
         private int condition;
         
-        public Armour(string itemName, int itemValue, string type, int defence, string bodyPart, int iNumber) : base(itemName, itemValue, true, iNumber)
+        public Armour(string itemName, int itemValue, string type, int defence, string bodyPart, int iNumber) : base(itemName, itemValue, true, iNumber, false, false)
         {
             itemType = "Armour";
             armourType = type;
@@ -282,7 +297,7 @@ namespace TextAdventure
         private string aidType;
         private int recoveryAmount;
 
-        public Aid(string itemName, int itemValue, string type, int restoreVolume, int iNumber) : base(itemName, itemValue, false, iNumber)
+        public Aid(string itemName, int itemValue, string type, int restoreVolume, int iNumber) : base(itemName, itemValue, false, iNumber, true, true)
         {
             aidType = type;
             recoveryAmount = restoreVolume;
@@ -297,6 +312,16 @@ namespace TextAdventure
         {
             get { return recoveryAmount; }
             set { recoveryAmount = value; }
+        }
+
+        public void UseItem(CharacterBase character, Item item)
+        {
+            if (item.Usable)
+            {
+                int statRestore = RestorationVolume;
+                character.PlayerHealth = character.PlayerHealth + statRestore;
+            }
+
         }
     }
 
