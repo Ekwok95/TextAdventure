@@ -1,0 +1,5 @@
+4
+walk
+pick up
+run
+help
