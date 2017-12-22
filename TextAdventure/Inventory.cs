@@ -1,12 +1,10 @@
-﻿
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Objects;
+using TextAdventure;
 
-namespace TextAdventure
+
+namespace Character
 {
     //Create one whole inventory first then branch out and have 6 lists
     //Add an array one main inventory and then more specific inventory lists
@@ -14,18 +12,18 @@ namespace TextAdventure
     {
         private List<Item> all;
         private int numberOfItems;
-        private CharacterBase mainCharacter;
+        //private CharacterBase mainCharacter;
 
-        public Inventory(CharacterBase player)
+        public Inventory()
         {
             all = new List<Item>();
             numberOfItems = 0;
-            mainCharacter = player;
+            //mainCharacter = player;
         }
         
         //Modify later to manipulate quanity rather than have another object in List.- DONE
         //Ensure to watch AddItem function in future as there is possibility for ArgumentOutOfRange Exception
-        public void AddItem(Item item)
+        public void AddItem(Objects.Item item)
         {
             bool itemInInventory = false;
             for(int i=0; i<numberOfItems; i++)
@@ -97,6 +95,7 @@ namespace TextAdventure
 
         //Receive user input to enter/exit inventory-- DONE
         //Detect user keypress to traverse inventory-- DONE
+
         public void TraverseInv()
         {
             bool leaveInventory = false;
@@ -132,6 +131,8 @@ namespace TextAdventure
                      * If a key is pressed, mark it with either 1 or 2. This mark will determine whether a key gets pressed again. If the key changes, the mark attached to the key will change as well.
                      * If a key is being spammed, no output will come out because the mark will determine whether output will be released or not.                   
                      */
+
+
                     key = Console.ReadKey();
 
                     if (key.Key == ConsoleKey.DownArrow)
@@ -202,6 +203,7 @@ namespace TextAdventure
                         Console.WriteLine("1. Use");
                         Console.WriteLine("2. Remove");
                         //Add in functions to delete or use items (2 element array)
+                        //Consider moving Use to only be done by player.
 
                         do
                         {
@@ -248,10 +250,12 @@ namespace TextAdventure
                                 if (choice == 0)
                                 {
                                     //Aid.UseItem(mainCharacter, all[currentItem]);
+
                                     /*
                                      * Change around dependencies so that character class will be one public class with other class as private additions (classes). In this case, move
                                      * UseItem function to character class. In fact, inventory class should be private class of character. 
                                     */
+
                                 }
                                 else if (choice == 1)
                                 {

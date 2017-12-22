@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TextAdventure
+namespace Opponent
 {
     public class Enemy
     {

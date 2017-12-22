@@ -1,7 +1,14 @@
 ﻿using System;
+using Opponent;
+using Objects;
 
-namespace TextAdventure
+namespace Character
 {   
+    /*
+     * Merge Player class with Equipment and Inventory Classes to prevent dependency requirement
+    */
+
+
     public abstract class CharacterBase
     {          
         protected string name;                 
@@ -12,15 +19,20 @@ namespace TextAdventure
         protected int attack;
         protected int defence;
         protected int[] primaryWeaponDamage;
+        protected Inventory inventory;
+        protected Equipment equipment;
+
 
         //Can probably adjust to hold any weapon but give advantages if weapon matches class specification...       
 
-        public CharacterBase(string user)
+        public CharacterBase(string user, Inventory playerItems, Equipment playerEquips)
         {
             name = user;
             currentXP = 0;
             requiredXP = 100;
             currentLevel = 1;
+            inventory = playerItems;
+            equipment = playerEquips;
         }
 
         public int PlayerCurrentXP
@@ -59,6 +71,18 @@ namespace TextAdventure
             set { defence = value; }
         }
 
+        public Inventory PlayerInventory
+        {
+            get { return inventory; }
+            //set { inventory = value; }
+        }
+
+        public Equipment PlayerEquips
+        {
+            get { return equipment; }
+            //set { equipment = value; }
+        }
+
         public override string ToString()
         {
             return name;
@@ -67,6 +91,14 @@ namespace TextAdventure
         public void CheckCondition()
         {
             Console.WriteLine("Your current HP is {0}.", hp);
+        }
+
+        public void UseItem(Item item)
+        {
+            if(item.ItemType.Equals("Aid"))
+            {
+                restoreHP((Objects.Aid)item);
+            }
         }
 
         public void ShowStats()
@@ -101,9 +133,12 @@ namespace TextAdventure
         //Function OK..
         public void requiredXPIncr()
         {
-            double nextLevelXP = Convert.ToDouble(PlayerNextLevelXP);
+            int requiredXP = 0;
+            double nextLevelXP = 0.0;
+
+            nextLevelXP = Convert.ToDouble(PlayerNextLevelXP);
             nextLevelXP = (nextLevelXP + (nextLevelXP * 1.5));
-            int requiredXP = Convert.ToInt32(nextLevelXP);
+            requiredXP = Convert.ToInt32(nextLevelXP);
             PlayerNextLevelXP = requiredXP;
             Console.WriteLine("Required xp: {0}", PlayerNextLevelXP);
         }
@@ -125,7 +160,30 @@ namespace TextAdventure
             return damage;
         }
 
+        private void restoreHP(Aid healing)
+        {
+            int statRestore = healing.RestorationVolume;
+            PlayerHealth = PlayerHealth + statRestore;
+            Console.WriteLine("You have recovered {0} HP.", statRestore);
+            Console.WriteLine("Your HP is now {0}.", PlayerHealth);
+        }
+
+
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public class Swordsman : CharacterBase, Slash, ISwordsman
     {
@@ -133,8 +191,7 @@ namespace TextAdventure
         protected string weaponType;
         protected string armorType;
 
-
-        public Swordsman(string user) : base(user)
+        public Swordsman(string user, Inventory inv, Equipment equips) : base(user, inv, equips)
         {
             className = "Swordsman";
             weaponType = "Long Sword";
@@ -153,10 +210,14 @@ namespace TextAdventure
             set { primaryWeaponDamage = value; }
         }
 
+        //Defence
+
         public void Guard()
         {
             Console.WriteLine("You block {0}'s attack!");
         }
+
+        //Attack
 
         //Change this function to attack or remove it.
         public void Fight(Enemy.GeneralEnemy enemy, int enemyHP, int attack, int defence)

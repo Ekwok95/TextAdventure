@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Character;
+using Objects;
+using Opponent;
 
 //Created by Bryan Kwok Zhe Jian on 1/3/2017.
 
@@ -23,6 +26,10 @@ using System.Threading.Tasks;
  * 26/3/2017- Inventory class almost complete. Only lacking a sorting function. Started Equipment class for equipping weapons & armour.
  * 17/12/2017 - Inventory class now has spam lock. Changed around some if statements so that only what is important will show.
  * 18/12/2017 - Changed some class names. Will most likely restructure dependencies for player class by combining inventory and equipment. Will add some more after considering in future.
+ * 21/12/2017 - Changed Namespace names. Now classes that have close relationships will be within the same namespace. 
+ *            - Will change classes so that they return object references instead of create dependencies between each class.
+ *              This is to prevent tethering between any number of classes so that the only errors messages that will come up are the
+ *              ones created by me. Recommended not to use exceptions in this case.
 */
 
 /*
@@ -79,7 +86,7 @@ using System.Threading.Tasks;
  * - Playtime- Use Stopwatch class methods and Stopwatch.Elapsed method then write this timestamp to file.
  *      - Retrive timestamp and add onto new elapsed time.
  * - Achievements
- * - Change namespace names
+ * - Change namespace names - DONE. Format for all object declarations from now on is [Namespace].[Class].[Interface]
 */
 
 namespace TextAdventure
@@ -108,7 +115,7 @@ namespace TextAdventure
         public static void RunGame()
         {
             ///*Player character*/
-            string intention, direction = "", temp = "";
+            string intention = "", direction = "", temp = "";
             int steps = 0;
             bool justLoggedIn = true;
             //string name = "";
@@ -119,7 +126,7 @@ namespace TextAdventure
             name = Console.ReadLine();
             */
             //Swordsman character = new Swordsman(name);
-            Swordsman character = new Swordsman("Ekwok");
+            Swordsman character = new Swordsman("Ekwok", null, null);
 
             ClearLine();
             //Change code for object creation.... 
@@ -137,14 +144,19 @@ namespace TextAdventure
             Actions setOfActions = new Actions();
             Random dice = new Random();
             Item[] items = createTestItems();
-            Inventory inventory = new Inventory(character);
+
+
+            //Inventory inventory = new Inventory(character);
             bool menuAction = false;
             bool releaseEnemy = false;
 
+            /*
             for(int i=0; i<7; i++)
             {
                 inventory.AddItem(items[i]);
             }
+
+            */
 
             //Place all movement, combat and misc actions into actions class....
             //Make individual action types/classes and then combine into final Action class....
@@ -186,12 +198,14 @@ namespace TextAdventure
                     releaseEnemy = false;
                 }
 
+                /*
                 else if (intention.Equals("inv"))
                 {
                     inventory.TraverseInv();
                     menuAction = true;
                     releaseEnemy = false;
                 }
+                */
 
                 /*
                 if (intention.Equals("lookaround"))
@@ -267,7 +281,7 @@ namespace TextAdventure
                                 string response = "";
                                 Console.WriteLine("You encounter an enemy!");
 
-                                Enemy.GeneralEnemy NormalEnemy = new Enemy.GeneralEnemy("Enemy", "Grunt", "Easy", 50, 5, 5, 50);
+                                Enemy.GeneralEnemy NormalEnemy = new Enemy.GeneralEnemy("Grunt", "Grunt", "Easy", 50, 5, 5, 50);
                                 NormalEnemy.EnemyLevel = character.PlayerLevel;
 
                                 Console.WriteLine("A {0} attempts to attack you.", NormalEnemy);
@@ -352,7 +366,7 @@ namespace TextAdventure
                                     Console.WriteLine("You have slain {0}!", NormalEnemy);
                                     Console.WriteLine("You have gained {0} xp from slaying {1}.", NormalEnemy.EnemyXP, NormalEnemy);
                                     Console.WriteLine("You pick up a {0} from slaying {1}.", potion, NormalEnemy);
-                                    inventory.AddItem(potion);
+                                    //inventory.AddItem(potion);
 
                                     character.addXP(NormalEnemy.EnemyXP);
 
@@ -470,7 +484,7 @@ namespace TextAdventure
             return outcome;
         }
 
-        public static Item[] createTestItems()
+        public static Objects.Item[] createTestItems()
         {            
             Item potion = new Aid("Potion", 10, "potion", 10, 1001);
             Item longsword = new Weapons("Longsword", 100, "sword", 1, 10, 2001);

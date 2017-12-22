@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TextAdventure
+namespace Character
 {
     public class Equipment
     {
@@ -61,4 +61,6 @@ namespace TextAdventure
             set { helmet = value; }
         }
     }
+
+
 }

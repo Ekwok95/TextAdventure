@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Character;
 
-namespace TextAdventure
+namespace Objects
 {
     public interface Condition
     {
@@ -314,7 +315,7 @@ namespace TextAdventure
             set { recoveryAmount = value; }
         }
 
-        public void UseItem(CharacterBase character, Item item)
+        public void UseItem(Character.CharacterBase character, Item item)
         {
             if (item.Usable)
             {
@@ -365,10 +366,12 @@ namespace TextAdventure
             }
         }*/
 
+        /*
         public void ThrowAway(Item item)
         {
             item = null;
         }
+        */
 
         public void Equip(Item item, CharacterBase character)
         {
