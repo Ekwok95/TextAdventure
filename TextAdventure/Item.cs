@@ -315,15 +315,7 @@ namespace Objects
             set { recoveryAmount = value; }
         }
 
-        public void UseItem(Character.CharacterBase character, Item item)
-        {
-            if (item.Usable)
-            {
-                int statRestore = RestorationVolume;
-                character.PlayerHealth = character.PlayerHealth + statRestore;
-            }
 
-        }
     }
 
     /*Attempt this when doing crafting system
