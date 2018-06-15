@@ -27,8 +27,8 @@ using Opponent;
  * 17/12/2017 - Inventory class now has spam lock. Changed around some if statements so that only what is important will show.
  * 18/12/2017 - Changed some class names. Will most likely restructure dependencies for player class by combining inventory and equipment. Will add some more after considering in future.
  * 21/12/2017 - Changed Namespace names. Now classes that have close relationships will be within the same namespace. 
- *            - Will change classes so that they return object references instead of create dependencies between each class.
- *              This is to prevent tethering between any number of classes so that the only errors messages that will come up are the
+ *             - Will change classes so that they return object references instead of create dependencies between each class.
+ *              This is to reduce tethering to a minimum between any number of classes so that the only errors messages that will come up are the
  *              ones created by me. Recommended not to use exceptions in this case.
 */
 
