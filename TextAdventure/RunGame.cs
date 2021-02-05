@@ -8,7 +8,6 @@ using Character;
 using Objects;
 using Opponent;
 
-//Created by Bryan Kwok Zhe Jian on 1/3/2017.
 
 /* Timestamp and completed features.
  * 1/3/2017- Created base command system, player class and basic functions and actions.
